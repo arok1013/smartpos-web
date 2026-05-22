@@ -24,3 +24,47 @@ Lalu buka `http://localhost:5173`.
 
 - Email: `admin@smartpos.test`
 - Password: `password`
+
+## Backend API
+
+Backend tersedia di folder `server` menggunakan Node.js, Express, MySQL, dan JWT.
+
+### Setup Database
+
+1. Buat database dan tabel:
+
+```bash
+mysql -u root -p < server/database/schema.sql
+```
+
+2. Isi data awal:
+
+```bash
+mysql -u root -p < server/database/seed.sql
+```
+
+### Jalankan API
+
+```bash
+cd server
+cp .env.example .env
+npm install
+npm run dev
+```
+
+API berjalan di `http://localhost:5000`.
+
+Endpoint utama:
+
+- `POST /api/auth/login`
+- `GET /api/products`
+- `POST /api/products`
+- `POST /api/users`
+- `POST /api/transactions`
+- `GET /api/reports/sales`
+
+Header untuk endpoint yang butuh login:
+
+```text
+Authorization: Bearer <token>
+```
