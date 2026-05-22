@@ -33,6 +33,7 @@ export default function App() {
         setProducts(nextProducts);
         saveProducts(nextProducts);
       },
+      onRegister: registerAccount,
       addTransaction: (transaction) => {
         const nextProducts = products.map((product) => {
           const sold = transaction.items.find((item) => item.id === product.id);

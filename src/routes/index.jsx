@@ -1,4 +1,5 @@
-import { BarChart3, Boxes, LayoutDashboard, ReceiptText } from 'lucide-react';
+import { BarChart3, Boxes, LayoutDashboard, ReceiptText, UserPlus } from 'lucide-react';
+import Accounts from '../pages/Accounts.jsx';
 import Cashier from '../pages/Cashier.jsx';
 import Dashboard from '../pages/Dashboard.jsx';
 import Products from '../pages/Products.jsx';
@@ -31,6 +32,13 @@ export const routes = [
     label: 'Laporan',
     icon: BarChart3,
     component: Reports,
+    roles: ['Admin'],
+  },
+  {
+    id: 'accounts',
+    label: 'Tambah Akun',
+    icon: UserPlus,
+    component: Accounts,
     roles: ['Admin'],
   },
 ];
