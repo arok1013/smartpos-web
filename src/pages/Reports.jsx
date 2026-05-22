@@ -33,22 +33,54 @@ export default function Reports({ transactions }) {
     return summary;
   }, {});
 
-  const exportCsv = () => {
-    const header = ['ID Transaksi', 'Tanggal', 'Metode', 'Total', 'Dibayar', 'Kembalian'];
-    const rows = filteredTransactions.map((transaction) => [
-      transaction.id,
-      new Date(transaction.date).toLocaleString('id-ID'),
-      transaction.paymentMethod,
-      transaction.total,
-      transaction.paid,
-      transaction.change,
-    ]);
-    const csv = [header, ...rows].map((row) => row.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const exportExcel = () => {
+    const rows = filteredTransactions
+      .map(
+        (transaction) => `
+          <tr>
+            <td>${transaction.id}</td>
+            <td>${new Date(transaction.date).toLocaleString('id-ID')}</td>
+            <td>${transaction.paymentMethod}</td>
+            <td>${transaction.total}</td>
+            <td>${transaction.paid}</td>
+            <td>${transaction.change}</td>
+          </tr>
+        `,
+      )
+      .join('');
+    const workbook = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
+        <head>
+          <meta charset="UTF-8" />
+          <style>
+            table { border-collapse: collapse; font-family: Arial, sans-serif; }
+            th { background: #2563eb; color: #fff; }
+            th, td { border: 1px solid #cbd5e1; padding: 8px; }
+            .number { mso-number-format: "0"; }
+          </style>
+        </head>
+        <body>
+          <table>
+            <thead>
+              <tr>
+                <th>ID Transaksi</th>
+                <th>Tanggal</th>
+                <th>Metode</th>
+                <th>Total</th>
+                <th>Dibayar</th>
+                <th>Kembalian</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </body>
+      </html>
+    `;
+    const blob = new Blob([workbook], { type: 'application/vnd.ms-excel;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `laporan-${range}.csv`;
+    link.download = `laporan-${range}.xls`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -60,9 +92,9 @@ export default function Reports({ transactions }) {
           <h1 className="page-title">Laporan</h1>
           <p className="page-subtitle">Pantau transaksi dan pendapatan toko.</p>
         </div>
-        <button className="primary-button gap-2" onClick={exportCsv} type="button">
+        <button className="primary-button gap-2" onClick={exportExcel} type="button">
           <Download size={18} />
-          Export CSV
+          Export Excel
         </button>
       </div>
 
