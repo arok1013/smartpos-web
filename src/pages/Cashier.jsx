@@ -37,6 +37,143 @@ export default function Cashier({ addTransaction, products }) {
     setCart((items) => items.filter((item) => item.id !== id));
   };
 
+  const printReceipt = (transaction) => {
+    const receiptWindow = window.open('', 'smartpos-receipt', 'width=380,height=640');
+    if (!receiptWindow) return;
+
+    const rows = transaction.items
+      .map(
+        (item) => `
+          <tr>
+            <td>
+              <strong>${item.name}</strong>
+              <span>${item.qty} x ${currency(item.price)}</span>
+            </td>
+            <td>${currency(item.qty * item.price)}</td>
+          </tr>
+        `,
+      )
+      .join('');
+
+    receiptWindow.document.write(`
+      <!doctype html>
+      <html lang="id">
+        <head>
+          <meta charset="UTF-8" />
+          <title>Struk ${transaction.id}</title>
+          <style>
+            * { box-sizing: border-box; }
+            body {
+              margin: 0;
+              background: #f8fafc;
+              color: #111827;
+              font-family: "Courier New", monospace;
+              font-size: 12px;
+            }
+            .receipt {
+              width: 80mm;
+              margin: 0 auto;
+              background: #fff;
+              padding: 14px;
+            }
+            h1 {
+              margin: 0;
+              text-align: center;
+              font-size: 18px;
+              letter-spacing: 0;
+            }
+            .center {
+              text-align: center;
+            }
+            .muted {
+              color: #4b5563;
+              font-size: 11px;
+            }
+            .divider {
+              border-top: 1px dashed #111827;
+              margin: 10px 0;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+            }
+            td {
+              padding: 4px 0;
+              vertical-align: top;
+            }
+            td:last-child {
+              text-align: right;
+              white-space: nowrap;
+            }
+            td span {
+              display: block;
+              margin-top: 2px;
+              color: #4b5563;
+              font-size: 11px;
+            }
+            .summary {
+              display: grid;
+              gap: 4px;
+            }
+            .summary div {
+              display: flex;
+              justify-content: space-between;
+              gap: 12px;
+            }
+            .total {
+              font-size: 14px;
+              font-weight: 700;
+            }
+            @media print {
+              @page {
+                size: 80mm auto;
+                margin: 0;
+              }
+              body {
+                background: #fff;
+              }
+              .receipt {
+                width: 80mm;
+                margin: 0;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <main class="receipt">
+            <h1>SmartPOS Web</h1>
+            <p class="center muted">Jl. Toko UMKM No. 1</p>
+            <div class="divider"></div>
+            <p>
+              No: ${transaction.id}<br />
+              Tanggal: ${new Date(transaction.date).toLocaleString('id-ID')}<br />
+              Bayar: ${transaction.paymentMethod}
+            </p>
+            <div class="divider"></div>
+            <table>
+              <tbody>${rows}</tbody>
+            </table>
+            <div class="divider"></div>
+            <section class="summary">
+              <div class="total"><span>Total</span><span>${currency(transaction.total)}</span></div>
+              <div><span>Dibayar</span><span>${currency(transaction.paid)}</span></div>
+              <div><span>Kembalian</span><span>${currency(transaction.change)}</span></div>
+            </section>
+            <div class="divider"></div>
+            <p class="center">Terima kasih</p>
+          </main>
+          <script>
+            window.onload = () => {
+              window.print();
+              window.onafterprint = () => window.close();
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    receiptWindow.document.close();
+  };
+
   const checkout = () => {
     if (cart.length === 0 || numericPaid < subtotal) return;
     const transaction = {
@@ -51,7 +188,7 @@ export default function Cashier({ addTransaction, products }) {
     addTransaction(transaction);
     setCart([]);
     setPaid('');
-    window.print();
+    printReceipt(transaction);
   };
 
   return (
