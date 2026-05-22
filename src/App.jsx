@@ -8,6 +8,7 @@ import {
   getTransactions,
   login,
   logout,
+  registerAccount,
   saveProducts,
   saveTransaction,
 } from './services/api.js';
@@ -46,18 +47,20 @@ export default function App() {
     [products, transactions],
   );
 
-  const currentRoute = routes.find((route) => route.id === activePage) ?? routes[0];
-  const Page = currentRoute.component;
-
   if (!user) {
-    return <Login onLogin={(credentials) => setUser(login(credentials))} />;
+    return <Login onLogin={(credentials) => setUser(login(credentials))} onRegister={registerAccount} />;
   }
+
+  const availableRoutes = routes.filter((route) => route.roles.includes(user.role));
+  const currentRoute = availableRoutes.find((route) => route.id === activePage) ?? availableRoutes[0];
+  const Page = currentRoute.component;
 
   return (
     <MainLayout
       activePage={activePage}
       darkMode={darkMode}
       onNavigate={setActivePage}
+      routes={availableRoutes}
       onToggleTheme={() => setDarkMode((value) => !value)}
       onLogout={() => {
         logout();

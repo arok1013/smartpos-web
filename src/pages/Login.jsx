@@ -2,9 +2,12 @@ import { LockKeyhole, Store } from 'lucide-react';
 import { useState } from 'react';
 import { STORE_NAME } from '../services/store.js';
 
-export default function Login({ onLogin }) {
+export default function Login({ onLogin, onRegister }) {
   const [form, setForm] = useState({ email: 'admin@smartpos.test', password: 'password' });
+  const [registerForm, setRegisterForm] = useState({ name: '', email: '', password: '', role: 'Kasir' });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [mode, setMode] = useState('login');
 
   const submit = (event) => {
     event.preventDefault();
@@ -13,6 +16,21 @@ export default function Login({ onLogin }) {
       onLogin(form);
     } catch (loginError) {
       setError(loginError.message);
+    }
+  };
+
+  const submitRegister = (event) => {
+    event.preventDefault();
+    setError('');
+    setSuccess('');
+    try {
+      onRegister(registerForm);
+      setSuccess('Akun berhasil dibuat. Silakan login.');
+      setForm({ email: registerForm.email, password: registerForm.password });
+      setRegisterForm({ name: '', email: '', password: '', role: 'Kasir' });
+      setMode('login');
+    } catch (registerError) {
+      setError(registerError.message);
     }
   };
 
@@ -37,7 +55,7 @@ export default function Login({ onLogin }) {
       </section>
 
       <section className="flex items-center justify-center px-5 py-10">
-        <form className="w-full max-w-md rounded-lg border border-slate-800 bg-slate-900 p-6 shadow-soft" onSubmit={submit}>
+        <div className="w-full max-w-md rounded-lg border border-slate-800 bg-slate-900 p-6 shadow-soft">
           <div className="mb-7 flex items-center gap-3">
             <div className="grid h-11 w-11 place-items-center rounded-lg bg-brand-600">
               <LockKeyhole size={22} />
@@ -48,34 +66,111 @@ export default function Login({ onLogin }) {
             </div>
           </div>
 
+          <div className="mb-5 grid grid-cols-2 rounded-lg bg-slate-950 p-1">
+            <button
+              className={`rounded-md px-3 py-2 text-sm font-semibold ${mode === 'login' ? 'bg-brand-600 text-white' : 'text-slate-300'}`}
+              onClick={() => setMode('login')}
+              type="button"
+            >
+              Masuk
+            </button>
+            <button
+              className={`rounded-md px-3 py-2 text-sm font-semibold ${mode === 'register' ? 'bg-brand-600 text-white' : 'text-slate-300'}`}
+              onClick={() => setMode('register')}
+              type="button"
+            >
+              Tambah Akun
+            </button>
+          </div>
+
           {error && <div className="mb-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</div>}
+          {success && <div className="mb-4 rounded-lg bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">{success}</div>}
 
-          <label className="field-label" htmlFor="email">
-            Email
-          </label>
-          <input
-            className="field-input mb-4 bg-slate-950 text-white"
-            id="email"
-            onChange={(event) => setForm({ ...form, email: event.target.value })}
-            type="email"
-            value={form.email}
-          />
+          {mode === 'login' ? (
+            <form onSubmit={submit}>
+              <label className="field-label" htmlFor="email">
+                Email
+              </label>
+              <input
+                className="field-input mb-4 bg-slate-950 text-white"
+                id="email"
+                onChange={(event) => setForm({ ...form, email: event.target.value })}
+                type="email"
+                value={form.email}
+              />
 
-          <label className="field-label" htmlFor="password">
-            Password
-          </label>
-          <input
-            className="field-input mb-6 bg-slate-950 text-white"
-            id="password"
-            onChange={(event) => setForm({ ...form, password: event.target.value })}
-            type="password"
-            value={form.password}
-          />
+              <label className="field-label" htmlFor="password">
+                Password
+              </label>
+              <input
+                className="field-input mb-6 bg-slate-950 text-white"
+                id="password"
+                onChange={(event) => setForm({ ...form, password: event.target.value })}
+                type="password"
+                value={form.password}
+              />
 
-          <button className="primary-button w-full" type="submit">
-            Masuk
-          </button>
-        </form>
+              <button className="primary-button w-full" type="submit">
+                Masuk
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={submitRegister}>
+              <label className="field-label" htmlFor="registerName">
+                Nama
+              </label>
+              <input
+                className="field-input mb-4 bg-slate-950 text-white"
+                id="registerName"
+                onChange={(event) => setRegisterForm({ ...registerForm, name: event.target.value })}
+                required
+                type="text"
+                value={registerForm.name}
+              />
+
+              <label className="field-label" htmlFor="registerEmail">
+                Email
+              </label>
+              <input
+                className="field-input mb-4 bg-slate-950 text-white"
+                id="registerEmail"
+                onChange={(event) => setRegisterForm({ ...registerForm, email: event.target.value })}
+                required
+                type="email"
+                value={registerForm.email}
+              />
+
+              <label className="field-label" htmlFor="registerPassword">
+                Password
+              </label>
+              <input
+                className="field-input mb-4 bg-slate-950 text-white"
+                id="registerPassword"
+                onChange={(event) => setRegisterForm({ ...registerForm, password: event.target.value })}
+                required
+                type="password"
+                value={registerForm.password}
+              />
+
+              <label className="field-label" htmlFor="registerRole">
+                Role
+              </label>
+              <select
+                className="field-input mb-6 bg-slate-950 text-white"
+                id="registerRole"
+                onChange={(event) => setRegisterForm({ ...registerForm, role: event.target.value })}
+                value={registerForm.role}
+              >
+                <option>Kasir</option>
+                <option>Admin</option>
+              </select>
+
+              <button className="primary-button w-full" type="submit">
+                Buat Akun
+              </button>
+            </form>
+          )}
+        </div>
       </section>
     </main>
   );

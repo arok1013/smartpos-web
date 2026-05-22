@@ -1,8 +1,7 @@
 import { Store } from 'lucide-react';
-import { routes } from '../routes/index.jsx';
 import { STORE_NAME } from '../services/store.js';
 
-export default function Sidebar({ activePage, mobileOpen, onNavigate }) {
+export default function Sidebar({ activePage, mobileOpen, onNavigate, routes }) {
   return (
     <aside
       className={`fixed inset-y-0 left-0 z-40 w-72 border-r border-slate-200 bg-white transition-transform duration-200 dark:border-slate-800 dark:bg-slate-950 lg:static lg:translate-x-0 ${

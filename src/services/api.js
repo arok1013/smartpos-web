@@ -1,6 +1,7 @@
 const PRODUCTS_KEY = 'smartpos_products';
 const TRANSACTIONS_KEY = 'smartpos_transactions';
 const USER_KEY = 'smartpos_user';
+const ACCOUNTS_KEY = 'smartpos_accounts';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const initialProducts = [
@@ -73,6 +74,23 @@ const initialTransactions = [
   },
 ];
 
+const initialAccounts = [
+  {
+    id: 'USR-ADMIN',
+    name: 'Admin Toko',
+    email: 'admin@smartpos.test',
+    password: 'password',
+    role: 'Admin',
+  },
+  {
+    id: 'USR-KASIR',
+    name: 'Kasir Toko',
+    email: 'kasir@smartpos.test',
+    password: 'password',
+    role: 'Kasir',
+  },
+];
+
 function readStorage(key, fallback) {
   try {
     return JSON.parse(localStorage.getItem(key)) ?? fallback;
@@ -137,15 +155,45 @@ export function getCurrentUser() {
   return readStorage(USER_KEY, null);
 }
 
+export function getAccounts() {
+  const accounts = readStorage(ACCOUNTS_KEY, null);
+  if (accounts) return accounts;
+  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(initialAccounts));
+  return initialAccounts;
+}
+
+export function registerAccount(account) {
+  const accounts = getAccounts();
+  const emailExists = accounts.some((item) => item.email.toLowerCase() === account.email.toLowerCase());
+  if (emailExists) {
+    throw new Error('Email sudah terdaftar.');
+  }
+
+  const newAccount = {
+    id: `USR-${Date.now().toString().slice(-6)}`,
+    name: account.name,
+    email: account.email,
+    password: account.password,
+    role: account.role,
+  };
+  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify([newAccount, ...accounts]));
+  return newAccount;
+}
+
 export function login({ email, password }) {
   if (!email || !password) {
     throw new Error('Email dan password wajib diisi.');
   }
 
+  const account = getAccounts().find((item) => item.email.toLowerCase() === email.toLowerCase() && item.password === password);
+  if (!account) {
+    throw new Error('Email atau password salah.');
+  }
+
   const user = {
-    name: email.includes('kasir') ? 'Kasir Toko' : 'Admin Toko',
-    email,
-    role: email.includes('kasir') ? 'Kasir' : 'Admin',
+    name: account.name,
+    email: account.email,
+    role: account.role,
   };
   localStorage.setItem(USER_KEY, JSON.stringify(user));
   return user;

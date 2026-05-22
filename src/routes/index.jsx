@@ -10,23 +10,27 @@ export const routes = [
     label: 'Dashboard',
     icon: LayoutDashboard,
     component: Dashboard,
+    roles: ['Admin', 'Kasir'],
   },
   {
     id: 'cashier',
     label: 'Kasir',
     icon: ReceiptText,
     component: Cashier,
+    roles: ['Admin', 'Kasir'],
   },
   {
     id: 'products',
     label: 'Produk',
     icon: Boxes,
     component: Products,
+    roles: ['Admin'],
   },
   {
     id: 'reports',
     label: 'Laporan',
     icon: BarChart3,
     component: Reports,
+    roles: ['Admin'],
   },
 ];

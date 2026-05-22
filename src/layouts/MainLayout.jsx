@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Navbar from '../components/Navbar.jsx';
 import Sidebar from '../components/Sidebar.jsx';
 
-export default function MainLayout({ activePage, children, darkMode, onLogout, onNavigate, onToggleTheme, user }) {
+export default function MainLayout({ activePage, children, darkMode, onLogout, onNavigate, onToggleTheme, routes, user }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navigate = (page) => {
@@ -14,7 +14,7 @@ export default function MainLayout({ activePage, children, darkMode, onLogout, o
     <div className="min-h-screen bg-slate-100 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       {mobileOpen && <button aria-label="Tutup menu" className="fixed inset-0 z-30 bg-slate-950/40 lg:hidden" onClick={() => setMobileOpen(false)} type="button" />}
       <div className="flex min-h-screen">
-        <Sidebar activePage={activePage} mobileOpen={mobileOpen} onNavigate={navigate} />
+        <Sidebar activePage={activePage} mobileOpen={mobileOpen} onNavigate={navigate} routes={routes} />
         <div className="min-w-0 flex-1">
           <Navbar
             darkMode={darkMode}
