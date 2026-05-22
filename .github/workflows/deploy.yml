@@ -1,5 +1,7 @@
 name: Deploy to GitHub Pages
 
+# Builds the Vite app and publishes the production bundle.
+
 on:
   push:
     branches:
