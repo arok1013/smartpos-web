@@ -1,4 +1,4 @@
-# SmartPOS Web
+# Griya Sembako Mart
 
 Aplikasi web kasir berbasis React, Vite, dan Tailwind CSS untuk demo POS UMKM.
 
@@ -24,4 +24,3 @@ Lalu buka `http://localhost:5173`.
 
 - Email: `admin@smartpos.test`
 - Password: `password`
-

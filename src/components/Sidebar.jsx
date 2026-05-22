@@ -1,5 +1,6 @@
 import { Store } from 'lucide-react';
 import { routes } from '../routes/index.jsx';
+import { STORE_NAME } from '../services/store.js';
 
 export default function Sidebar({ activePage, mobileOpen, onNavigate }) {
   return (
@@ -13,8 +14,8 @@ export default function Sidebar({ activePage, mobileOpen, onNavigate }) {
           <Store size={22} />
         </div>
         <div>
-          <p className="text-lg font-bold text-slate-950 dark:text-white">SmartPOS</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Web kasir toko</p>
+          <p className="text-lg font-bold text-slate-950 dark:text-white">{STORE_NAME}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Sembako mart</p>
         </div>
       </div>
 

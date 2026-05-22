@@ -2,6 +2,7 @@ import { Minus, Plus, Printer, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import ProductCard from '../components/ProductCard.jsx';
 import { createTransactionId, currency } from '../services/api.js';
+import { STORE_ADDRESS, STORE_NAME } from '../services/store.js';
 
 export default function Cashier({ addTransaction, products }) {
   const [query, setQuery] = useState('');
@@ -141,8 +142,8 @@ export default function Cashier({ addTransaction, products }) {
         </head>
         <body>
           <main class="receipt">
-            <h1>SmartPOS Web</h1>
-            <p class="center muted">Jl. Toko UMKM No. 1</p>
+            <h1>${STORE_NAME}</h1>
+            <p class="center muted">${STORE_ADDRESS}</p>
             <div class="divider"></div>
             <p>
               No: ${transaction.id}<br />

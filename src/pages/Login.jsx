@@ -1,5 +1,6 @@
 import { LockKeyhole, Store } from 'lucide-react';
 import { useState } from 'react';
+import { STORE_NAME } from '../services/store.js';
 
 export default function Login({ onLogin }) {
   const [form, setForm] = useState({ email: 'admin@smartpos.test', password: 'password' });
@@ -28,9 +29,9 @@ export default function Login({ onLogin }) {
           <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-lg bg-brand-600">
             <Store size={30} />
           </div>
-          <h1 className="max-w-xl text-5xl font-bold leading-tight">SmartPOS Web</h1>
+          <h1 className="max-w-xl text-5xl font-bold leading-tight">{STORE_NAME}</h1>
           <p className="mt-4 max-w-lg text-lg text-slate-200">
-            Sistem kasir cepat untuk transaksi, stok, dan laporan toko harian.
+            Sistem kasir untuk transaksi, stok, dan laporan toko sembako.
           </p>
         </div>
       </section>
