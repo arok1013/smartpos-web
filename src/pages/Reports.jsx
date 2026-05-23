@@ -35,17 +35,42 @@ export default function Reports({ transactions }) {
 
   const exportExcel = () => {
     const rows = filteredTransactions
-      .map(
-        (transaction) => `
+      .flatMap((transaction) =>
+        transaction.items.length > 0
+          ? transaction.items.map(
+              (item) => `
           <tr>
             <td>${transaction.id}</td>
             <td>${new Date(transaction.date).toLocaleString('id-ID')}</td>
             <td>${transaction.paymentMethod}</td>
+            <td>${item.id}</td>
+            <td>${item.name}</td>
+            <td>${item.qty}</td>
+            <td>${item.price}</td>
+            <td>${item.qty * item.price}</td>
             <td>${transaction.total}</td>
             <td>${transaction.paid}</td>
             <td>${transaction.change}</td>
           </tr>
         `,
+            )
+          : [
+              `
+          <tr>
+            <td>${transaction.id}</td>
+            <td>${new Date(transaction.date).toLocaleString('id-ID')}</td>
+            <td>${transaction.paymentMethod}</td>
+            <td>-</td>
+            <td>-</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>${transaction.total}</td>
+            <td>${transaction.paid}</td>
+            <td>${transaction.change}</td>
+          </tr>
+        `,
+            ],
       )
       .join('');
     const workbook = `
@@ -66,6 +91,11 @@ export default function Reports({ transactions }) {
                 <th>ID Transaksi</th>
                 <th>Tanggal</th>
                 <th>Metode</th>
+                <th>ID Produk</th>
+                <th>Nama Produk</th>
+                <th>Qty</th>
+                <th>Harga</th>
+                <th>Subtotal Item</th>
                 <th>Total</th>
                 <th>Dibayar</th>
                 <th>Kembalian</th>
@@ -134,6 +164,19 @@ export default function Reports({ transactions }) {
             { key: 'id', label: 'ID' },
             { key: 'date', label: 'Tanggal', render: (transaction) => new Date(transaction.date).toLocaleString('id-ID') },
             { key: 'paymentMethod', label: 'Metode' },
+            {
+              key: 'items',
+              label: 'Produk',
+              render: (transaction) => (
+                <div className="space-y-1">
+                  {transaction.items.map((item) => (
+                    <p className="text-xs" key={`${transaction.id}-${item.id}`}>
+                      <span className="font-semibold">{item.id}</span> - {item.name} x {item.qty}
+                    </p>
+                  ))}
+                </div>
+              ),
+            },
             { key: 'total', label: 'Total', render: (transaction) => currency(transaction.total) },
             { key: 'change', label: 'Kembalian', render: (transaction) => currency(transaction.change) },
           ]}

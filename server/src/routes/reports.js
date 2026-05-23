@@ -27,11 +27,11 @@ router.get(
     );
 
     const [bestProducts] = await pool.query(
-      `SELECT product_name, SUM(qty) AS sold
+      `SELECT product_id, product_name, SUM(qty) AS sold
        FROM transaction_items ti
        JOIN transactions t ON t.id = ti.transaction_id
        WHERE t.created_at >= DATE_SUB(NOW(), INTERVAL ${interval})
-       GROUP BY product_name
+       GROUP BY product_id, product_name
        ORDER BY sold DESC
        LIMIT 10`,
     );

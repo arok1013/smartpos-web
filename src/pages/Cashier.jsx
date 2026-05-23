@@ -10,6 +10,7 @@ export default function Cashier({ addTransaction, products }) {
   const [paid, setPaid] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [error, setError] = useState('');
+  const [scanMessage, setScanMessage] = useState('');
 
   const filteredProducts = products.filter((product) => {
     const keyword = query.toLowerCase();
@@ -28,6 +29,23 @@ export default function Cashier({ addTransaction, products }) {
       }
       return [...items, { ...product, qty: 1 }];
     });
+  };
+
+  const scanBarcode = (barcode) => {
+    const code = barcode.trim();
+    if (!code) return;
+
+    const product = products.find((item) => item.barcode === code);
+    if (!product) {
+      setScanMessage('');
+      setError(`Barcode ${code} tidak ditemukan.`);
+      return;
+    }
+
+    addToCart(product);
+    setQuery('');
+    setError('');
+    setScanMessage(`${product.name} berhasil ditambahkan dari barcode ${code}.`);
   };
 
   const updateQty = (id, qty) => {
@@ -186,7 +204,7 @@ export default function Cashier({ addTransaction, products }) {
       paid: numericPaid,
       total: subtotal,
       change,
-      items: cart.map(({ id, name, price, qty }) => ({ id, name, price, qty })),
+      items: cart.map(({ id, name, barcode, price, qty }) => ({ id, name, barcode, price, qty })),
     };
     try {
       await addTransaction(transaction);
@@ -202,16 +220,23 @@ export default function Cashier({ addTransaction, products }) {
     <div className="space-y-6">
       <div>
         <h1 className="page-title">Halaman Kasir</h1>
-        <p className="page-subtitle">Cari produk, tambah ke keranjang, dan hitung kembalian otomatis.</p>
+        <p className="page-subtitle">Scan barcode atau cari produk, lalu hitung kembalian otomatis.</p>
       </div>
       {error && <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-200">{error}</div>}
+      {scanMessage && <div className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-100">{scanMessage}</div>}
 
       <section className="grid gap-6 xl:grid-cols-[1fr_420px]">
         <div className="space-y-4">
           <input
             className="field-input"
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Cari nama produk, SKU, kategori, atau scan barcode"
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                scanBarcode(query);
+              }
+            }}
+            placeholder="Scan barcode atau cari nama produk, SKU, kategori"
             type="search"
             value={query}
           />
