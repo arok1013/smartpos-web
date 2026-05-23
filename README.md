@@ -54,6 +54,22 @@ npm run dev
 
 API berjalan di `http://localhost:5000`.
 
+### Sambungkan Frontend ke API
+
+Buat file `.env` di root project:
+
+```bash
+VITE_API_BASE_URL=http://localhost:5000/api
+```
+
+Lalu jalankan frontend:
+
+```bash
+npm run dev
+```
+
+Jika `VITE_API_BASE_URL` belum diset, frontend otomatis memakai mode demo `localStorage`.
+
 Endpoint utama:
 
 - `POST /api/auth/login`

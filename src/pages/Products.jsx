@@ -1,7 +1,7 @@
 import { Edit, Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import Table from '../components/Table.jsx';
-import { createProductId, currency } from '../services/api.js';
+import { currency } from '../services/api.js';
 
 const emptyForm = {
   name: '',
@@ -13,28 +13,38 @@ const emptyForm = {
   image: '',
 };
 
-export default function Products({ products, setProducts }) {
+export default function Products({ deleteProduct, products, saveProduct }) {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [query, setQuery] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   const filteredProducts = useMemo(() => {
     const keyword = query.toLowerCase();
     return products.filter((product) => [product.name, product.category, product.sku, product.barcode].some((value) => value.toLowerCase().includes(keyword)));
   }, [products, query]);
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault();
+    setError('');
+    setSuccess('');
     const product = {
       ...form,
-      id: editingId ?? createProductId(),
+      id: editingId,
       price: Number(form.price),
       stock: Number(form.stock),
       image: form.image || 'https://images.unsplash.com/photo-1601599963565-b7ba29c8e095?auto=format&fit=crop&w=400&q=80',
     };
-    setProducts(editingId ? products.map((item) => (item.id === editingId ? product : item)) : [product, ...products]);
-    setForm(emptyForm);
-    setEditingId(null);
+
+    try {
+      await saveProduct(product);
+      setSuccess(`Produk ${form.name} berhasil disimpan.`);
+      setForm(emptyForm);
+      setEditingId(null);
+    } catch (saveError) {
+      setError(saveError.message);
+    }
   };
 
   const editProduct = (product) => {
@@ -42,8 +52,15 @@ export default function Products({ products, setProducts }) {
     setForm({ ...product, price: String(product.price), stock: String(product.stock) });
   };
 
-  const deleteProduct = (id) => {
-    setProducts(products.filter((product) => product.id !== id));
+  const remove = async (id) => {
+    setError('');
+    setSuccess('');
+    try {
+      await deleteProduct(id);
+      setSuccess('Produk berhasil dihapus.');
+    } catch (deleteError) {
+      setError(deleteError.message);
+    }
   };
 
   return (
@@ -56,6 +73,8 @@ export default function Products({ products, setProducts }) {
       <section className="grid gap-6 xl:grid-cols-[380px_1fr]">
         <form className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900" onSubmit={submit}>
           <h2 className="section-title mb-4">{editingId ? 'Edit Produk' : 'Tambah Produk'}</h2>
+          {error && <div className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-200">{error}</div>}
+          {success && <div className="mb-4 rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-200">{success}</div>}
           {[
             ['name', 'Nama Barang'],
             ['category', 'Kategori'],
@@ -129,7 +148,7 @@ export default function Products({ products, setProducts }) {
                     <button className="icon-button" onClick={() => editProduct(product)} title="Edit produk" type="button">
                       <Edit size={16} />
                     </button>
-                    <button className="icon-button text-red-600 dark:text-red-400" onClick={() => deleteProduct(product.id)} title="Hapus produk" type="button">
+                    <button className="icon-button text-red-600 dark:text-red-400" onClick={() => remove(product.id)} title="Hapus produk" type="button">
                       <Trash2 size={16} />
                     </button>
                   </div>

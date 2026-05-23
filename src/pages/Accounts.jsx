@@ -13,12 +13,12 @@ export default function Accounts({ onRegister }) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault();
     setError('');
     setSuccess('');
     try {
-      onRegister(form);
+      await onRegister(form);
       setSuccess(`Akun ${form.name} berhasil dibuat.`);
       setForm(emptyForm);
     } catch (registerError) {

@@ -9,6 +9,7 @@ export default function Cashier({ addTransaction, products }) {
   const [cart, setCart] = useState([]);
   const [paid, setPaid] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('Cash');
+  const [error, setError] = useState('');
 
   const filteredProducts = products.filter((product) => {
     const keyword = query.toLowerCase();
@@ -175,8 +176,9 @@ export default function Cashier({ addTransaction, products }) {
     receiptWindow.document.close();
   };
 
-  const checkout = () => {
+  const checkout = async () => {
     if (cart.length === 0 || numericPaid < subtotal) return;
+    setError('');
     const transaction = {
       id: createTransactionId(),
       date: new Date().toISOString(),
@@ -186,10 +188,14 @@ export default function Cashier({ addTransaction, products }) {
       change,
       items: cart.map(({ id, name, price, qty }) => ({ id, name, price, qty })),
     };
-    addTransaction(transaction);
-    setCart([]);
-    setPaid('');
-    printReceipt(transaction);
+    try {
+      await addTransaction(transaction);
+      setCart([]);
+      setPaid('');
+      printReceipt(transaction);
+    } catch (checkoutError) {
+      setError(checkoutError.message);
+    }
   };
 
   return (
@@ -198,6 +204,7 @@ export default function Cashier({ addTransaction, products }) {
         <h1 className="page-title">Halaman Kasir</h1>
         <p className="page-subtitle">Cari produk, tambah ke keranjang, dan hitung kembalian otomatis.</p>
       </div>
+      {error && <div className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-200">{error}</div>}
 
       <section className="grid gap-6 xl:grid-cols-[1fr_420px]">
         <div className="space-y-4">

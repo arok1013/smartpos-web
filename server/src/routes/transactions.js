@@ -15,7 +15,24 @@ router.get(
        LEFT JOIN users u ON u.id = t.cashier_id
        ORDER BY t.created_at DESC`,
     );
-    res.json(transactions);
+    const [items] = await pool.execute('SELECT * FROM transaction_items ORDER BY id ASC');
+    const itemsByTransaction = items.reduce((grouped, item) => {
+      grouped[item.transaction_id] = grouped[item.transaction_id] || [];
+      grouped[item.transaction_id].push({
+        id: item.product_id,
+        name: item.product_name,
+        qty: item.qty,
+        price: Number(item.price),
+      });
+      return grouped;
+    }, {});
+
+    res.json(
+      transactions.map((transaction) => ({
+        ...transaction,
+        items: itemsByTransaction[transaction.id] || [],
+      })),
+    );
   }),
 );
 

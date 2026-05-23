@@ -6,11 +6,11 @@ export default function Login({ onLogin }) {
   const [form, setForm] = useState({ email: 'admin@smartpos.test', password: 'password' });
   const [error, setError] = useState('');
 
-  const submit = (event) => {
+  const submit = async (event) => {
     event.preventDefault();
     setError('');
     try {
-      onLogin(form);
+      await onLogin(form);
     } catch (loginError) {
       setError(loginError.message);
     }
